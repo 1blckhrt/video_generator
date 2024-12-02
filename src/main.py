@@ -1,4 +1,27 @@
 import tkinter as tk
+from tkinter import filedialog, messagebox
+
+
+def browse_files(file_type: str) -> str:
+    """
+    Opens the file dialog for selecting a file.
+    """
+    root = tk.Tk()
+    root.withdraw()
+
+    if file_type == "audio":
+        filename = filedialog.askopenfilename(
+            title="Select Audio File", filetypes=[("Audio Files", "*.mp3;*.wav;*.aac;*.flac;*.ogg")]
+        )
+    elif file_type == "image":
+        filename = filedialog.askopenfilename(
+            title="Select Image File", filetypes=[("Image Files", "*.png;*.jpg;*.jpeg")]
+        )
+
+    if not filename:
+        messagebox.showwarning("Warning", f"No {file_type} file selected.")
+
+    return filename
 
 
 def main():
@@ -34,6 +57,7 @@ def main():
     get_audio_button = tk.Button(
         window,
         text="Open Audio File",
+        command=lambda: browse_files("audio"),
         font=("Arial", 13),
         bg="blue",
         fg="white",
@@ -42,6 +66,7 @@ def main():
     get_image_button = tk.Button(
         window,
         text="Open Image File",
+        command=lambda: browse_files("image"),
         font=("Arial", 13),
         bg="blue",
         fg="white",
