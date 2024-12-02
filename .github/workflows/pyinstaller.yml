@@ -38,14 +38,14 @@ jobs:
         Rename-Item "dist\main.exe" $outputName
 
     - name: Upload PyInstaller build artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: built-application
         path: dist\1blckhrt_video_generator_v1.1.exe
 
     - name: Create GitHub Release
       id: create_release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2.1.0
       with:
         tag_name: v1.1
         release_name: "Release v1.1"
