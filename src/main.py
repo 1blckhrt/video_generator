@@ -133,9 +133,20 @@ def combine_audio_image(audio_path: str, image_path: str, output_path: str):
         ]
 
         subprocess.run(command, check=True)
-
         messagebox.showinfo("Success", f"Output saved to: {output_path}")
 
+    except subprocess.CalledProcessError as e:
+        messagebox.showerror("Error", f"An error occurred: {e}")
+
+
+def remove_adjusted_image(image_path: str):
+    """
+    Removes the adjusted image file if it exists.
+    :param image_path: Path to the adjusted image file
+    """
+    try:
+        if image_path:
+            subprocess.run(["rm", image_path])
     except subprocess.CalledProcessError as e:
         messagebox.showerror("Error", f"An error occurred: {e}")
 
@@ -199,14 +210,19 @@ def main():
         fg="white",
     )
 
+    def combine_and_cleanup():
+        if not audio_path.get() or not image_path.get():
+            messagebox.showwarning("Warning", "Please select both an audio and image file.")
+            return
+
+        adjusted_image_path = ensure_16_9_aspect_ratio(image_path.get(), "adjusted_image.png")
+        combine_audio_image(audio_path=audio_path.get(), image_path=adjusted_image_path, output_path=get_output_path())
+        remove_adjusted_image(adjusted_image_path)
+
     combine_button = tk.Button(
         window,
         text="Combine Audio and Image",
-        command=lambda: combine_audio_image(
-            audio_path=audio_path.get(),
-            image_path=ensure_16_9_aspect_ratio(image_path.get(), "adjusted_image.png"),
-            output_path=get_output_path(),
-        ),
+        command=combine_and_cleanup,
         font=("Arial", 13),
         bg="green",
         fg="white",
