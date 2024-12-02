@@ -41,7 +41,6 @@ jobs:
         $version = "1.1"
         $outputName = "1blckhrt-video_converter-v$version.exe"
         poetry run pyinstaller --onefile --name $outputName src\main.py
-        Rename-Item "dist\main.exe" $outputName
 
     - name: Upload PyInstaller build artifacts
       uses: actions/upload-artifact@v4
