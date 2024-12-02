@@ -2,6 +2,8 @@ import subprocess
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
+from PIL import Image, ImageOps
+
 
 def browse_files(file_type: str) -> str:
     """
@@ -23,6 +25,59 @@ def browse_files(file_type: str) -> str:
         messagebox.showwarning("Warning", f"No {file_type} file selected.")
 
     return filename
+
+
+def ensure_16_9_aspect_ratio(image_path: str, output_path: str):
+    """
+    Ensures the image has a 16:9 aspect ratio by resizing or padding it,
+    and ensures both dimensions are divisible by 2.
+    :param image_path: Path to the input image
+    :param output_path: Path to save the adjusted image
+    """
+    with Image.open(image_path) as img:
+        width, height = img.size
+        target_ratio = 16 / 9
+
+        current_ratio = width / height
+
+        if abs(current_ratio - target_ratio) < 0.01:
+            img = ensure_even_dimensions(img)
+            img.save(output_path)
+            return output_path
+
+        if current_ratio > target_ratio:
+            new_height = int(width / target_ratio)
+            img = ImageOps.pad(img, (width, new_height), color=(0, 0, 0))
+        else:
+            new_width = int(height * target_ratio)
+            img = ImageOps.pad(img, (new_width, height), color=(0, 0, 0))
+
+        # Ensure the dimensions are even
+        img = ensure_even_dimensions(img)
+
+        # Save the adjusted image
+        img.save(output_path)
+        return output_path
+
+
+def ensure_even_dimensions(img):
+    """
+    Ensures both width and height are divisible by 2.
+    :param img: PIL Image object
+    :return: Adjusted image
+    """
+    width, height = img.size
+
+    # Adjust width if not divisible by 2
+    if width % 2 != 0:
+        width -= 1
+
+    # Adjust height if not divisible by 2
+    if height % 2 != 0:
+        height -= 1
+
+    # Resize the image to even dimensions if necessary
+    return img.resize((width, height))
 
 
 def get_output_path() -> str:
@@ -78,6 +133,7 @@ def combine_audio_image(audio_path: str, image_path: str, output_path: str):
         ]
 
         subprocess.run(command, check=True)
+
         messagebox.showinfo("Success", f"Output saved to: {output_path}")
 
     except subprocess.CalledProcessError as e:
@@ -147,7 +203,9 @@ def main():
         window,
         text="Combine Audio and Image",
         command=lambda: combine_audio_image(
-            audio_path=audio_path.get(), image_path=image_path.get(), output_path=get_output_path()
+            audio_path=audio_path.get(),
+            image_path=ensure_16_9_aspect_ratio(image_path.get(), "adjusted_image.png"),
+            output_path=get_output_path(),
         ),
         font=("Arial", 13),
         bg="green",
