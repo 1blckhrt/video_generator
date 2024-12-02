@@ -5,7 +5,6 @@
 - The program uses the `ffmpeg` library to generate the video file, please ensure that `ffmpeg` is installed on your system and added to the system path.
 
 ## Requirements
-- Python 3.12.6
 - ffmpeg installed and added to path
 
 ## Execution
