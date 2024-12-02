@@ -53,7 +53,7 @@ jobs:
       uses: softprops/action-gh-release@v2.1.0
       with:
         tag_name: v1.1
-        release_name: "Release v1.1"
-        files: dist\1blckhrt-video_converter-v1.1.exe
+        name: "Release v1.1"
+        files: dist\*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
