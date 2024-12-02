@@ -1,3 +1,4 @@
+import os
 import subprocess
 import tkinter as tk
 from tkinter import filedialog, messagebox
@@ -52,10 +53,8 @@ def ensure_16_9_aspect_ratio(image_path: str, output_path: str):
             new_width = int(height * target_ratio)
             img = ImageOps.pad(img, (new_width, height), color=(0, 0, 0))
 
-        # Ensure the dimensions are even
         img = ensure_even_dimensions(img)
 
-        # Save the adjusted image
         img.save(output_path)
         return output_path
 
@@ -76,7 +75,6 @@ def ensure_even_dimensions(img):
     if height % 2 != 0:
         height -= 1
 
-    # Resize the image to even dimensions if necessary
     return img.resize((width, height))
 
 
@@ -145,9 +143,9 @@ def remove_adjusted_image(image_path: str):
     :param image_path: Path to the adjusted image file
     """
     try:
-        if image_path:
-            subprocess.run(["rm", image_path])
-    except subprocess.CalledProcessError as e:
+        if image_path and os.path.exists(image_path):
+            os.remove(image_path)
+    except Exception as e:
         messagebox.showerror("Error", f"An error occurred: {e}")
 
 
@@ -216,7 +214,11 @@ def main():
             return
 
         adjusted_image_path = ensure_16_9_aspect_ratio(image_path.get(), "adjusted_image.png")
-        combine_audio_image(audio_path=audio_path.get(), image_path=adjusted_image_path, output_path=get_output_path())
+        combine_audio_image(
+            audio_path=audio_path.get(),
+            image_path=adjusted_image_path,
+            output_path=get_output_path(),
+        )
         remove_adjusted_image(adjusted_image_path)
 
     combine_button = tk.Button(
@@ -258,3 +260,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    print("This script is not meant to be imported.")
+    exit(1)
