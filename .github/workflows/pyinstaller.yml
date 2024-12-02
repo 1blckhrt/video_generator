@@ -26,7 +26,7 @@ jobs:
       run: poetry install
 
     - name: Package Application
-      run: poetry run pyinstaller --onefile --name 1blckhrt-video_converter-v1.1.exe src/main.py
+      run: poetry run pyinstaller --onefile --name 1blckhrt-video_converter-v1.1.exe main.py
       working-directory: src
 
     - uses: actions/upload-artifact@v4
