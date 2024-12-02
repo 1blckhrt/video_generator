@@ -18,11 +18,11 @@ jobs:
       with:
         python-version: '3.12.6'
 
-    - name: Install Poetry
+    - name: Install Poetry via pip
       run: |
-        Invoke-WebRequest -Uri https://install.python-poetry.org -OutFile install-poetry.py
-        python install-poetry.py
-        $env:PATH = "$env:USERPROFILE\.poetry\bin;$env:PATH"
+        python -m pip install --upgrade pip
+        pip install poetry
+        echo "Poetry installed"
 
     - name: Install dependencies using Poetry
       run: |
@@ -34,7 +34,7 @@ jobs:
     - name: Define version and build with PyInstaller
       run: |
         $version = "1.1"
-        $outputName = "my_program_v$version.exe"
+        $outputName = "1blckhrt-video-converter_v$version.exe"
         poetry run pyinstaller --onefile --name $outputName src\main.py
         Rename-Item "dist\main.exe" $outputName
 
@@ -42,7 +42,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: built-application
-        path: dist\my_program_v1.1.exe
+        path: dist\1blckhrt-video-converter_v1.1.exe
 
     - name: Create GitHub Release
       id: create_release
@@ -50,6 +50,6 @@ jobs:
       with:
         tag_name: v1.1
         release_name: "Release v1.1"
-        files: dist\my_program_v1.1.exe
+        files: dist\1blckhrt-video-converter_v1.1.exe
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
