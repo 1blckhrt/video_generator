@@ -1,11 +1,11 @@
-from tkinter import Label, Tk
+from tkinter import Tk
 
 
 def main():
-    root = Tk()
-    window = Label(root, text="(@1blckhrt) Audio and Image to Video Converter")
+    window = Tk()
+    window.title("(@1blckhrt) Audio and Image Merger")
     window.pack()
-    root.mainloop()
+    window.mainloop()
 
 
 if __name__ == "__main__":
