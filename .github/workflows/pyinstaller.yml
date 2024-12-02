@@ -1,0 +1,54 @@
+name: PyInstaller Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.12.6'
+
+    - name: Install Poetry
+      run: |
+        iex ((New-Object System.Net.WebClient).DownloadString('https://install.python-poetry.org'))
+        $env:PATH = "$env:USERPROFILE\.poetry\bin;$env:PATH"
+
+    - name: Install dependencies using Poetry
+      run: |
+        poetry install --no-dev
+
+    - name: Install PyInstaller
+      run: poetry add pyinstaller --dev
+
+    - name: Define version and build with PyInstaller
+      run: |
+        $version = "1.1"
+        $outputName = "1blckhrt_video_generator_v$version.exe"
+        poetry run pyinstaller --onefile --name $outputName src\main.py
+        Rename-Item "dist\main.exe" $outputName
+
+    - name: Upload PyInstaller build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: built-application
+        path: dist\1blckhrt_video_generator_v1.1.exe
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v1.1
+        release_name: "Release v1.1"
+        files: dist\1blckhrt_video_generator_v1.1.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

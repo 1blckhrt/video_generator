@@ -28,7 +28,7 @@ def browse_files(file_type: str) -> str:
     return filename
 
 
-def ensure_16_9_aspect_ratio(image_path: str, output_path: str):
+def ensure_16_9_aspect_ratio(image_path: str, output_path: str) -> str:
     """
     Ensures the image has a 16:9 aspect ratio by resizing or padding it,
     and ensures both dimensions are divisible by 2.
@@ -59,7 +59,7 @@ def ensure_16_9_aspect_ratio(image_path: str, output_path: str):
         return output_path
 
 
-def ensure_even_dimensions(img):
+def ensure_even_dimensions(img) -> Image:
     """
     Ensures both width and height are divisible by 2.
     :param img: PIL Image object
@@ -95,7 +95,7 @@ def get_output_path() -> str:
     return output_path
 
 
-def combine_audio_image(audio_path: str, image_path: str, output_path: str):
+def combine_audio_image(audio_path: str, image_path: str, output_path: str) -> None:
     """
     Combines an image with audio to create a video using ffmpeg.
     :param image_path: Path to the image file
@@ -134,10 +134,10 @@ def combine_audio_image(audio_path: str, image_path: str, output_path: str):
         messagebox.showinfo("Success", f"Output saved to: {output_path}")
 
     except subprocess.CalledProcessError as e:
-        messagebox.showerror("Error", f"An error occurred: {e}")
+        messagebox.showerror("Error", f"Please check that you have ffmpeg installed. An error occurred: {e}")
 
 
-def remove_adjusted_image(image_path: str):
+def remove_adjusted_image(image_path: str) -> None:
     """
     Removes the adjusted image file if it exists.
     :param image_path: Path to the adjusted image file
@@ -149,7 +149,7 @@ def remove_adjusted_image(image_path: str):
         messagebox.showerror("Error", f"An error occurred: {e}")
 
 
-def main():
+def main() -> None:
     window = tk.Tk()
     window.title("(@1blckhrt) Audio and Image Merger")
     window.geometry("500x500")
@@ -208,7 +208,7 @@ def main():
         fg="white",
     )
 
-    def combine_and_cleanup():
+    def combine_and_cleanup() -> None:
         if not audio_path.get() or not image_path.get():
             messagebox.showwarning("Warning", "Please select both an audio and image file.")
             return
