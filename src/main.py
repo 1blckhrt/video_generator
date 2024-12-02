@@ -9,6 +9,7 @@ from PIL import Image, ImageOps
 def browse_files(file_type: str) -> str:
     """
     Opens the file dialog for selecting a file.
+    :param file_type: Type of file to select (audio or image)
     """
     root = tk.Tk()
     root.withdraw()
@@ -34,6 +35,7 @@ def ensure_16_9_aspect_ratio(image_path: str, output_path: str) -> str:
     and ensures both dimensions are divisible by 2.
     :param image_path: Path to the input image
     :param output_path: Path to save the adjusted image
+    :return: Path to the adjusted image
     """
     with Image.open(image_path) as img:
         width, height = img.size
@@ -81,6 +83,7 @@ def ensure_even_dimensions(img) -> Image:
 def get_output_path() -> str:
     """
     Prompts the user for the output file path.
+    :return: Path to save the output video
     """
     root = tk.Tk()
     root.withdraw()
