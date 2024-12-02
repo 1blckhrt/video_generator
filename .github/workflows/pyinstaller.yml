@@ -24,9 +24,14 @@ jobs:
         pip install poetry
         echo "Poetry installed"
 
+    - name: Run poetry lock to sync lock file
+      run: |
+        poetry lock --no-update
+        echo "Lock file updated"
+
     - name: Install dependencies using Poetry
       run: |
-        poetry install --no-dev
+        poetry install --only main
 
     - name: Install PyInstaller
       run: poetry add pyinstaller --dev
@@ -34,7 +39,7 @@ jobs:
     - name: Define version and build with PyInstaller
       run: |
         $version = "1.1"
-        $outputName = "1blckhrt-video-converter_v$version.exe"
+        $outputName = "1blckhrt-video_converter-v$version.exe"
         poetry run pyinstaller --onefile --name $outputName src\main.py
         Rename-Item "dist\main.exe" $outputName
 
@@ -42,7 +47,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: built-application
-        path: dist\1blckhrt-video-converter_v1.1.exe
+        path: dist\1blckhrt-video_converter-v1.1.exe
 
     - name: Create GitHub Release
       id: create_release
@@ -50,6 +55,6 @@ jobs:
       with:
         tag_name: v1.1
         release_name: "Release v1.1"
-        files: dist\1blckhrt-video-converter_v1.1.exe
+        files: dist\1blckhrt-video_converter-v1.1.exe
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
