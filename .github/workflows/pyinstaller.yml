@@ -22,10 +22,12 @@ jobs:
         pip install poetry
 
     - name: Install Project Dependencies
-      run: poetry install --no-root
+      run: |
+        poetry install --no-root
+        poetry add pyinstaller --group dev
 
     - name: Package Application
-      run: poetry run pyinstaller --onefile --windowed --name "1blckhrt-video_converter-v1.2" main.py
+      run: poetry run python -m PyInstaller --onefile --windowed --name "1blckhrt-video_converter-v1.2" main.py
       working-directory: src
 
     - name: Upload Artifacts
