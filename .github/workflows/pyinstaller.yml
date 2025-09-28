@@ -6,16 +6,15 @@ on:
 
 jobs:
   build:
-
     runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v4
 
     - name: Set up Python 
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.13.1
+        python-version: '3.13.1'
 
     - name: Install Poetry
       run: |
@@ -23,19 +22,19 @@ jobs:
         pip install poetry
 
     - name: Install Project Dependencies
-      run: poetry install
+      run: poetry install --no-root
 
     - name: Package Application
-      run: poetry run pyinstaller --onefile --name 1blckhrt-video_converter-v1.2.exe main.py
+      run: poetry run pyinstaller --onefile --windowed --name "1blckhrt-video_converter-v1.2" main.py
       working-directory: src
 
-    - uses: actions/upload-artifact@v4
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
       with:
         name: built-application
         path: src/dist/1blckhrt-video_converter-v1.2.exe
 
     - name: Create GitHub Release
-      id: create_release
       uses: softprops/action-gh-release@v2.1.0
       with:
         tag_name: v1.2
