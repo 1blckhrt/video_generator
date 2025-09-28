@@ -1,9 +1,10 @@
 import os
-import subprocess
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
 from PIL import Image, ImageOps
+from PIL.Image import Image as PILImage
+from moviepy import ImageClip, AudioFileClip
 
 
 def browse_files(file_type: str) -> str:
@@ -16,11 +17,13 @@ def browse_files(file_type: str) -> str:
 
     if file_type == "audio":
         filename = filedialog.askopenfilename(
-            title="Select Audio File", filetypes=[("Audio Files", "*.mp3;*.wav;*.aac;*.flac;*.ogg")]
+            title="Select Audio File",
+            filetypes=[("Audio Files", "*.mp3 *.wav *.aac *.flac *.ogg *.m4a")],
         )
     elif file_type == "image":
         filename = filedialog.askopenfilename(
-            title="Select Image File", filetypes=[("Image Files", "*.png;*.jpg;*.jpeg")]
+            title="Select Image File",
+            filetypes=[("Image Files", "*.png *.jpg *.jpeg *.bmp *.tiff")],
         )
 
     if not filename:
@@ -61,7 +64,7 @@ def ensure_16_9_aspect_ratio(image_path: str, output_path: str) -> str:
         return output_path
 
 
-def ensure_even_dimensions(img) -> Image:
+def ensure_even_dimensions(img: PILImage) -> PILImage:
     """
     Ensures both width and height are divisible by 2.
     :param img: PIL Image object
@@ -89,7 +92,13 @@ def get_output_path() -> str:
     root.withdraw()
 
     output_path = filedialog.asksaveasfilename(
-        title="Save Output Video", defaultextension=".mp4", filetypes=[("MP4 Video", "*.mp4")]
+        title="Save Output Video",
+        defaultextension=".mp4",
+        filetypes=[
+            ("MP4 Video", "*.mp4"),
+            ("AVI Video", "*.avi"),
+            ("MOV Video", "*.mov"),
+        ],
     )
 
     if not output_path:
@@ -100,44 +109,44 @@ def get_output_path() -> str:
 
 def combine_audio_image(audio_path: str, image_path: str, output_path: str) -> None:
     """
-    Combines an image with audio to create a video using ffmpeg.
-    :param image_path: Path to the image file
+    Combines an image with audio to create a video using MoviePy.
     :param audio_path: Path to the audio file
+    :param image_path: Path to the image file
     :param output_path: Path to save the output video
     """
-
     try:
         if not audio_path or not image_path:
-            messagebox.showwarning("Warning", "Please select both an audio and image file.")
+            messagebox.showwarning(
+                "Warning", "Please select both an audio and image file."
+            )
             return
 
-        command = [
-            "ffmpeg",
-            "-loop",
-            "1",  # Loop the image
-            "-i",
-            image_path,  # Input image
-            "-i",
-            audio_path,  # Input audio
-            "-c:v",
-            "libx264",  # Encode video using H.264 codec
-            "-tune",
-            "stillimage",  # Optimize for still images
-            "-c:a",
-            "aac",  # Encode audio in AAC format
-            "-b:a",
-            "192k",  # Audio bitrate
-            "-pix_fmt",
-            "yuv420p",  # Pixel format for wide compatibility
-            "-shortest",  # Match the duration to the audio
-            output_path,
-        ]
+        messagebox.showinfo("Processing", "Combining audio and image, please wait...")
 
-        subprocess.run(command, check=True)
+        audio = AudioFileClip(audio_path)
+
+        image_clip = ImageClip(image_path, duration=audio.duration)
+
+        video = image_clip.with_audio(audio)
+
+        video.write_videofile(
+            output_path,
+            codec="libx264",
+            audio_codec="aac",
+            fps=25,  # Standard fps for better compatibility
+            preset="medium",  # Encoding preset
+            ffmpeg_params=["-pix_fmt", "yuv420p"],  # Ensure compatibility
+            logger=None,
+        )
+
+        audio.close()
+        image_clip.close()
+        video.close()
+
         messagebox.showinfo("Success", f"Output saved to: {output_path}")
 
-    except subprocess.CalledProcessError as e:
-        messagebox.showerror("Error", f"Please check that you have ffmpeg installed. An error occurred: {e}")
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
 
 def remove_adjusted_image(image_path: str) -> None:
@@ -149,7 +158,7 @@ def remove_adjusted_image(image_path: str) -> None:
         if image_path and os.path.exists(image_path):
             os.remove(image_path)
     except Exception as e:
-        messagebox.showerror("Error", f"An error occurred: {e}")
+        messagebox.showerror("Error", f"An error occurred while cleaning up: {e}")
 
 
 def main() -> None:
@@ -213,14 +222,22 @@ def main() -> None:
 
     def combine_and_cleanup() -> None:
         if not audio_path.get() or not image_path.get():
-            messagebox.showwarning("Warning", "Please select both an audio and image file.")
+            messagebox.showwarning(
+                "Warning", "Please select both an audio and image file."
+            )
             return
 
-        adjusted_image_path = ensure_16_9_aspect_ratio(image_path.get(), "adjusted_image.png")
+        output_path = get_output_path()
+        if not output_path:
+            return
+
+        adjusted_image_path = ensure_16_9_aspect_ratio(
+            image_path.get(), "adjusted_image.png"
+        )
         combine_audio_image(
             audio_path=audio_path.get(),
             image_path=adjusted_image_path,
-            output_path=get_output_path(),
+            output_path=output_path,
         )
         remove_adjusted_image(adjusted_image_path)
 
@@ -239,6 +256,7 @@ def main() -> None:
         font=("Arial", 12),
         bg="black",
         fg="white",
+        wraplength=450,
     )
 
     image_path_label = tk.Label(
@@ -247,16 +265,17 @@ def main() -> None:
         font=("Arial", 12),
         bg="black",
         fg="white",
+        wraplength=450,
     )
 
     title_label.pack(padx=20, pady=20)
     audio_file_explorer_label.pack()
     get_audio_button.pack()
-    audio_path_label.pack()
+    audio_path_label.pack(pady=5)
     image_file_explorer_label.pack()
     get_image_button.pack()
-    image_path_label.pack()
-    combine_button.pack()
+    image_path_label.pack(pady=5)
+    combine_button.pack(pady=20)
 
     window.mainloop()
 

@@ -12,10 +12,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Python 3.12
+    - name: Set up Python 
       uses: actions/setup-python@v4
       with:
-        python-version: 3.12.6
+        python-version: 3.13.1
 
     - name: Install Poetry
       run: |
@@ -26,20 +26,20 @@ jobs:
       run: poetry install
 
     - name: Package Application
-      run: poetry run pyinstaller --onefile --name 1blckhrt-video_converter-v1.1.exe main.py
+      run: poetry run pyinstaller --onefile --name 1blckhrt-video_converter-v1.2.exe main.py
       working-directory: src
 
     - uses: actions/upload-artifact@v4
       with:
         name: built-application
-        path: src/dist/1blckhrt-video_converter-v1.1.exe
+        path: src/dist/1blckhrt-video_converter-v1.2.exe
 
     - name: Create GitHub Release
       id: create_release
       uses: softprops/action-gh-release@v2.1.0
       with:
-        tag_name: v1.1
-        name: "Release v1.1"
-        files: src/dist/1blckhrt-video_converter-v1.1.exe
+        tag_name: v1.2
+        name: "Release v1.2"
+        files: src/dist/1blckhrt-video_converter-v1.2.exe
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

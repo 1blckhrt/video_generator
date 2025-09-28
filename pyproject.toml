@@ -6,8 +6,9 @@ authors = ["1blckhrt <williams.1691@wright.edu>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.12.6"
+python = "3.13.1"
 pillow = "^11.0.0"
+moviepy = "^2.2.1"
 
 
 [tool.poetry.group.dev.dependencies]
