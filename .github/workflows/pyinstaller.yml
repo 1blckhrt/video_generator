@@ -28,7 +28,7 @@ jobs:
 
       - name: Package Application
         run: |
-          uv run pyinstaller --windowed --onefile --hidden-import=imageio_ffmpeg --hidden-import=moviepy.video.io.VideoFileClip --hidden-import=moviepy.audio.io.AudioFileClip --collect-all imageio_ffmpeg --collect-all moviepy src\main.py --copy-metadata imageio -n "1blckhrt-video_converter-v1.4.exe"
+          uv run pyinstaller --windowed --onefile --hidden-import=imageio_ffmpeg --hidden-import=moviepy.video.io.VideoFileClip --hidden-import=moviepy.audio.io.AudioFileClip --collect-all imageio_ffmpeg --collect-all moviepy main.py --copy-metadata imageio -n "1blckhrt-video_converter-v1.4.exe"
         working-directory: src
 
       - name: Upload Artifacts
