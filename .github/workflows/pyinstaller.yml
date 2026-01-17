@@ -2,45 +2,46 @@ name: Package Application with PyInstaller
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python 
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.13.1'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13.1"
 
-    - name: Install Poetry
-      run: |
-        python -m pip install --upgrade pip
-        pip install poetry
+      - name: Install uv
+        run: |
+          python -m pip install --upgrade pip
+          pip install uv
 
-    - name: Install Project Dependencies
-      run: |
-        poetry install --no-root
-        poetry add pyinstaller --group dev
+      - name: Install Project Dependencies
+        run: |
+          uv sync
+        working-directory: src
 
-    - name: Package Application
-      run: poetry run python -m PyInstaller --onefile --windowed --name "1blckhrt-video_converter-v1.3" main.py
-      working-directory: src
+      - name: Package Application
+        run: |
+          uv run pyinstaller --windowed --onefile --hidden-import=imageio_ffmpeg --hidden-import=moviepy.video.io.VideoFileClip --hidden-import=moviepy.audio.io.AudioFileClip --collect-all imageio_ffmpeg --collect-all moviepy .\src\main.py --copy-metadata imageio -n "1blckhrt-video_converter-v1.4.exe"
+        working-directory: src
 
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: built-application
-        path: src/dist/1blckhrt-video_converter-v1.3.exe
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-application
+          path: src/dist/1blckhrt-video_converter-v1.4.exe
 
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v2.1.0
-      with:
-        tag_name: v1.3
-        name: "Release v1.3"
-        files: src/dist/1blckhrt-video_converter-v1.3.exe
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2.1.0
+        with:
+          tag_name: v1.4
+          name: "Release v1.4"
+          files: src/dist/1blckhrt-video_converter-v1.4.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

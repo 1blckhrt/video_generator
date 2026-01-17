@@ -1,16 +1,18 @@
-[tool.poetry]
+[project]
 name = "video-generator"
 version = "0.1.0"
 description = "Combines images and audio to create a video"
 authors = ["1blckhrt <williams.1691@wright.edu>"]
 readme = "README.md"
-package-mode = false
+dependencies = [
+    "imageio-ffmpeg>=0.6.0",
+    "moviepy>=2.2.1",
+    "pillow>=11.3.0",
+]
 
-[tool.poetry.dependencies]
-python = "3.13.1"
-pillow = "^11.0.0"
-moviepy = "^2.2.1"
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.18.0",
+]
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+

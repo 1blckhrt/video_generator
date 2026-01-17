@@ -2,9 +2,13 @@ import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
+import imageio_ffmpeg
+
+os.environ["IMAGEIO_FFMPEG_EXE"] = imageio_ffmpeg.get_ffmpeg_exe()
+
 from PIL import Image, ImageOps
 from PIL.Image import Image as PILImage
-from moviepy import ImageClip, AudioFileClip
+from moviepy import ImageClip, AudioFileClip, VideoClip
 
 
 def browse_files(file_type: str) -> str:
@@ -115,7 +119,7 @@ def combine_audio_image(audio_path: str, image_path: str, output_path: str) -> N
     :param output_path: Path to save the output video
     """
     try:
-        if not audio_path or not image_path:
+        if not audio_path or not image_path or not output_path:
             messagebox.showwarning(
                 "Warning", "Please select both an audio and image file."
             )
@@ -124,10 +128,8 @@ def combine_audio_image(audio_path: str, image_path: str, output_path: str) -> N
         messagebox.showinfo("Processing", "Combining audio and image, please wait...")
 
         audio = AudioFileClip(audio_path)
-
         image_clip = ImageClip(image_path, duration=audio.duration)
-
-        video = image_clip.with_audio(audio)
+        video: VideoClip = image_clip.with_audio(audio)
 
         video.write_videofile(
             output_path,
@@ -135,19 +137,22 @@ def combine_audio_image(audio_path: str, image_path: str, output_path: str) -> N
             fps=10,
             preset="ultrafast",
             ffmpeg_params=["-pix_fmt", "yuv420p"],
-            logger="bar",
             threads=8,
             bitrate="20000k",
+            logger=None,
         )
-
-        audio.close()
-        image_clip.close()
-        video.close()
 
         messagebox.showinfo("Success", f"Output saved to: {output_path}")
 
     except Exception as e:
-        messagebox.showerror("Error", f"An error occurred: {str(e)}")
+        messagebox.showerror(
+            "Error", f"An error occurred: {str(e)}\n\nType: {type(e).__name__}"
+        )
+
+    finally:
+        audio.close()
+        image_clip.close()
+        video.close()
 
 
 def remove_adjusted_image(image_path: str) -> None:
@@ -164,6 +169,7 @@ def remove_adjusted_image(image_path: str) -> None:
 
 def main() -> None:
     window = tk.Tk()
+    window.protocol("WM_DELETE_WINDOW", window.quit)
     window.title("(@1blckhrt) Audio and Image Merger")
     window.geometry("500x500")
     window.config(background="black", padx=20, pady=20)
