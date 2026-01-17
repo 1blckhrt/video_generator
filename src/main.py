@@ -132,11 +132,12 @@ def combine_audio_image(audio_path: str, image_path: str, output_path: str) -> N
         video.write_videofile(
             output_path,
             codec="libx264",
-            audio_codec="aac",
-            fps=25,  # Standard fps for better compatibility
-            preset="medium",  # Encoding preset
-            ffmpeg_params=["-pix_fmt", "yuv420p"],  # Ensure compatibility
-            logger=None,
+            fps=10,
+            preset="ultrafast",
+            ffmpeg_params=["-pix_fmt", "yuv420p"],
+            logger="bar",
+            threads=8,
+            bitrate="20000k",
         )
 
         audio.close()
